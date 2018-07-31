@@ -9,3 +9,6 @@
 DerivedData
 /libs/openFrameworksCompiled/lib/ios/build
 
+/libs/openFrameworksCompiled/lib/ios/libofxiOS_iphonesimulator_Debug.a
+/apps/myApps/tvOSExample
+/apps/myApps/SkyMapsTest
