@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="landscape">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--App Navigation Controller-->
+        <scene sceneID="bi6-c7-UfI">
+            <objects>
+                <viewController storyboardIdentifier="AppNavigationController" id="LlW-cM-XSN" customClass="AppNavigationController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="b3J-fE-QVa"/>
+                        <viewControllerLayoutGuide type="bottom" id="QYJ-zv-muj"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="OeZ-Zj-xRh">
+                        <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="00M-8J-0f4" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2" y="135"/>
+        </scene>
+        <!--Of App View Controller-->
+        <scene sceneID="k8a-zk-bWo">
+            <objects>
+                <viewController storyboardIdentifier="ofAppViewController" id="fGH-hr-xi7" customClass="ofAppViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="X8Y-gY-l1o"/>
+                        <viewControllerLayoutGuide type="bottom" id="nh5-iq-Mwp"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="cXk-tT-o33">
+                        <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uWh-BY-cme" customClass="CAEAGLLayerView">
+                                <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                                <color key="backgroundColor" red="1" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="uWh-BY-cme" firstAttribute="height" secondItem="cXk-tT-o33" secondAttribute="height" id="HWD-Nb-h1B"/>
+                            <constraint firstItem="uWh-BY-cme" firstAttribute="width" secondItem="cXk-tT-o33" secondAttribute="width" id="Zbf-62-FUh"/>
+                            <constraint firstItem="uWh-BY-cme" firstAttribute="leading" secondItem="cXk-tT-o33" secondAttribute="leadingMargin" constant="-20" id="e5T-k2-0RU"/>
+                            <constraint firstItem="uWh-BY-cme" firstAttribute="top" secondItem="X8Y-gY-l1o" secondAttribute="bottom" constant="-20" id="e69-4K-vej"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="glLayerView" destination="uWh-BY-cme" id="U84-bV-yIh"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PER-N1-lYu" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="621.13943028485767" y="140"/>
+        </scene>
+    </scenes>
+</document>
