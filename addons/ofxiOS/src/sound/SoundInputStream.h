@@ -11,5 +11,5 @@
 @interface SoundInputStream : SoundStream {
 
 }
-@property(strong, nonatomic)id delegate;
+
 @end

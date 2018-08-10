@@ -29,10 +29,8 @@ typedef enum {
 - (void)soundStreamError:(id)sender error:(NSString *)error;
 @end
 
-@interface SoundStream : NSObject 
-{
-@public
-	/*
+@interface SoundStream : NSObject {
+    id<SoundStreamDelegate> delegate;
     SoundStreamType streamType;
     NSInteger numOfChannels;
     NSInteger sampleRate;
@@ -40,20 +38,16 @@ typedef enum {
     NSInteger numOfBuffers;
     AudioUnit audioUnit;
     BOOL bInterruptedWhileRunning;
-	 */
-	 AudioUnit audioUnit;
-	//id<SoundStreamDelegate>__unsafe_unretained delegate;
-
 }
 
-@property (nonatomic, strong) id delegate;
-@property (nonatomic, assign) SoundStreamType streamType;
-@property (nonatomic, assign) NSInteger numOfChannels;
-@property (nonatomic, assign) NSInteger sampleRate;
-@property (nonatomic, assign) NSInteger bufferSize;
-@property (nonatomic, assign) NSInteger numOfBuffers;
-//@property (nonatomic, assign) AudioUnit audioUnit;
-@property (nonatomic, assign) BOOL bInterruptedWhileRunning;
+@property (nonatomic, assign) id delegate;
+@property (readonly) SoundStreamType streamType;
+@property (readonly) NSInteger numOfChannels;
+@property (readonly) NSInteger sampleRate;
+@property (readonly) NSInteger bufferSize;
+@property (readonly) NSInteger numOfBuffers;
+@property (readonly) AudioUnit audioUnit;
+@property (assign) BOOL bInterruptedWhileRunning;
 
 - (id)initWithNumOfChannels:(NSInteger)numOfChannels
              withSampleRate:(NSInteger)sampleRate

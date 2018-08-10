@@ -8,9 +8,6 @@
 
 #import "SoundStream.h"
 
-
-
-
 @interface SoundOutputStream : SoundStream
-@property(strong, nonatomic)id delegate;
+
 @end

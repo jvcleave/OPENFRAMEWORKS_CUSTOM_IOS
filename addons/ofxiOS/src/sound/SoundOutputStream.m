@@ -23,7 +23,7 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
                                                 UInt32 inNumberFrames,
                                                 AudioBufferList *ioData) {
 
-    SoundOutputStream * stream = (__bridge SoundOutputStream *)inRefCon;
+    SoundOutputStream * stream = (SoundOutputStream *)inRefCon;
     AudioBuffer * audioBuffer = &ioData->mBuffers[0];
 	
 	// clearing the buffer before handing it off to the user
@@ -32,16 +32,14 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
     
     int bufferSize = (audioBuffer->mDataByteSize / sizeof(Float32)) / audioBuffer->mNumberChannels;
     bufferSize = MIN(bufferSize, MAX_BUFFER_SIZE / audioBuffer->mNumberChannels);
-	//ofxiOSSoundStreamDelegate* streamDelegate = (ofxiOSSoundStreamDelegate*)stream.delegate;
-	
-	/*
+    
     if([stream.delegate respondsToSelector:@selector(soundStreamRequested:output:bufferSize:numOfChannels:)]) {
-        
-    }*/
-	[stream.delegate soundStreamRequested:stream
-								   output:(float*)audioBuffer->mData
-							   bufferSize:bufferSize
-							numOfChannels:audioBuffer->mNumberChannels];
+        [stream.delegate soundStreamRequested:stream
+                                       output:(float*)audioBuffer->mData
+                                   bufferSize:bufferSize
+                                numOfChannels:audioBuffer->mNumberChannels];
+    }
+	
     return noErr;
 }
 
@@ -60,7 +58,7 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
                          withSampleRate:value1
                          withBufferSize:value2];
     if(self) {
-        self.streamType = SoundStreamTypeOutput;
+        streamType = SoundStreamTypeOutput;
     }
     
     return self;
@@ -68,6 +66,7 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
 
 - (void)dealloc {
     [self stop];
+    [super dealloc];
 }
 
 - (void)start {
@@ -92,13 +91,13 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
     
     // get component and get audio units.
 	AudioComponent inputComponent = AudioComponentFindNext(NULL, &desc);
-	[self checkStatus:AudioComponentInstanceNew(inputComponent, &(self->audioUnit))];
+	[self checkStatus:AudioComponentInstanceNew(inputComponent, &audioUnit)];
     
     //---------------------------------------------------------- enable io.
     
     // enable output out of AudioUnit.
 	UInt32 on = 1;
-    [self checkStatus:AudioUnitSetProperty(self->audioUnit,
+    [self checkStatus:AudioUnitSetProperty(audioUnit,
 										   kAudioOutputUnitProperty_EnableIO,
 										   kAudioUnitScope_Output,
 										   kOutputBus,
@@ -109,18 +108,18 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
     
     // Describe format
     AudioStreamBasicDescription audioFormat = {
-		.mSampleRate       = self.sampleRate,
+		.mSampleRate       = sampleRate,
 		.mFormatID         = kAudioFormatLinearPCM,
 		.mFormatFlags      = kAudioFormatFlagsNativeFloatPacked,
 		.mFramesPerPacket  = 1,
-		.mChannelsPerFrame = self.numOfChannels,
-		.mBytesPerFrame    = sizeof(Float32) * self.numOfChannels,
-		.mBytesPerPacket   = sizeof(Float32) * self.numOfChannels,
+		.mChannelsPerFrame = numOfChannels,
+		.mBytesPerFrame    = sizeof(Float32) * numOfChannels,
+		.mBytesPerPacket   = sizeof(Float32) * numOfChannels,
 		.mBitsPerChannel   = sizeof(Float32) * 8
 	};
     
     // Apply format
-	[self checkStatus:AudioUnitSetProperty(self->audioUnit,
+	[self checkStatus:AudioUnitSetProperty(audioUnit,
 										   kAudioUnitProperty_StreamFormat,
 										   kAudioUnitScope_Input,
 										   kOutputBus,
@@ -129,8 +128,8 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
     
     //---------------------------------------------------------- render callback.
     
-	AURenderCallbackStruct callback = {soundOutputStreamRenderCallback, CFBridgingRetain(self)};
-	[self checkStatus:AudioUnitSetProperty(self->audioUnit,
+	AURenderCallbackStruct callback = {soundOutputStreamRenderCallback, self};
+	[self checkStatus:AudioUnitSetProperty(audioUnit,
 										   kAudioUnitProperty_SetRenderCallback,
 										   kAudioUnitScope_Global,
 										   kOutputBus,
@@ -139,8 +138,8 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
      
     //---------------------------------------------------------- go!
     
-	[self checkStatus:AudioUnitInitialize(self->audioUnit)];
-    [self checkStatus:AudioOutputUnitStart(self->audioUnit)];
+	[self checkStatus:AudioUnitInitialize(audioUnit)];
+    [self checkStatus:AudioOutputUnitStart(audioUnit)];
 }
 
 - (void)stop {
@@ -150,10 +149,10 @@ static OSStatus soundOutputStreamRenderCallback(void *inRefCon,
         return;
     }
     
-    [self checkStatus:AudioOutputUnitStop(self->audioUnit)];
-    [self checkStatus:AudioUnitUninitialize(self->audioUnit)];
-    [self checkStatus:AudioComponentInstanceDispose(self->audioUnit)];
-    self->audioUnit = nil;
+    [self checkStatus:AudioOutputUnitStop(audioUnit)];
+    [self checkStatus:AudioUnitUninitialize(audioUnit)];
+    [self checkStatus:AudioComponentInstanceDispose(audioUnit)];
+    audioUnit = nil;
 }
 
 @end

@@ -5,6 +5,7 @@
 //
 
 #import "AVSoundPlayer.h"
+#include <TargetConditionals.h>
 
 @interface AVSoundPlayer() {
     BOOL bMultiPlay;
@@ -32,15 +33,26 @@
 	if(audioSessionSetup) {
 		return;
 	}
-	[[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error: nil];
-	UInt32 doSetProperty = 1;
-	AudioSessionSetProperty (kAudioSessionProperty_OverrideCategoryMixWithOthers, sizeof(doSetProperty), &doSetProperty);
+	NSString * playbackCategory = AVAudioSessionCategoryPlayAndRecord;
+#ifdef TARGET_OF_TVOS
+	playbackCategory = AVAudioSessionCategoryPlayback;
+#endif
+	[[AVAudioSession sharedInstance] setCategory:playbackCategory error: nil];
+    AVAudioSession * audioSession = [AVAudioSession sharedInstance];
+    NSError * err = nil;
+    // need to configure set the audio category, and override to it route the audio to the speaker
+    if([audioSession respondsToSelector:@selector(setCategory:withOptions:error:)]) {
+        if(![audioSession setCategory:playbackCategory
+             						  withOptions:AVAudioSessionCategoryOptionMixWithOthers
+                                        error:&err]) { err = nil; }
+    }
 	[[AVAudioSession sharedInstance] setActive: YES error: nil];
 	audioSessionSetup = YES;
 }
 
 - (void)dealloc {
     [self unloadSound];
+    [super dealloc];
 }
 
 //----------------------------------------------------------- load / unload.
@@ -60,7 +72,8 @@
     [self unloadSound];
 	[self setupSharedSession];
     NSError * error = nil;
-	self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&error];
+    self.player = [[[AVAudioPlayer alloc] initWithContentsOfURL:url
+                                                          error:&error] autorelease];
     if([self.player respondsToSelector:@selector(setEnableRate:)]) {
         [self.player setEnableRate:YES];
     }
@@ -236,9 +249,13 @@
 }
 
 - (void) audioPlayerEndInterruption:(AVAudioPlayer *)player withFlags:(NSUInteger)flags {
+#if TARGET_OS_IOS || (TARGET_OS_IPHONE && !TARGET_OS_TV)
 	if(flags == AVAudioSessionInterruptionFlags_ShouldResume) {
 		[self.player play];
 	}
+#elif TARGET_OS_TV
+	//
+#endif
 }
 
 @end

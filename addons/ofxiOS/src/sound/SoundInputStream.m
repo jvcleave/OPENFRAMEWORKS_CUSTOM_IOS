@@ -20,7 +20,7 @@
 typedef struct {
 	AudioBufferList * bufferList;
 	AudioUnit remoteIO;
-	__unsafe_unretained SoundInputStream* stream;
+	SoundInputStream * stream;
 }
 SoundInputStreamContext;
 
@@ -91,7 +91,7 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
                          withSampleRate:value1
                          withBufferSize:value2];
     if(self) {
-        self.streamType = SoundStreamTypeInput;
+        streamType = SoundStreamTypeInput;
     }
     
     return self;
@@ -99,6 +99,7 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
 
 - (void)dealloc {
     [self stop];
+    [super dealloc];
 }
 
 - (void)start {
@@ -115,43 +116,19 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
 	AVAudioSession * audioSession = [AVAudioSession sharedInstance];
 	NSError * err = nil;
 	
-    #ifdef __IPHONE_6_0
 	// need to configure set the audio category, and override to it route the audio to the speaker
 	if([audioSession respondsToSelector:@selector(setCategory:withOptions:error:)]) {
 		// we're on iOS 6 or greater, so use the AVFoundation API
 		if(![audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
-						  withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
+						  withOptions:AVAudioSessionCategoryOptionMixWithOthers
 								error:&err]) {
 			[self reportError:err];
 			err = nil;
 		}
 	} else {
-    #endif
-		// we're on iOS 5 or lower, need to use the C Audio Session API
-		UInt32 sessionType = kAudioSessionCategory_PlayAndRecord;
-		OSStatus success = AudioSessionSetProperty(kAudioSessionProperty_AudioCategory,
-												   sizeof(sessionType),
-												   &sessionType);
-		
-		if(success != noErr) {
-			if([self.delegate respondsToSelector:@selector(soundStreamError:error:)]) {
-				[self.delegate soundStreamError:self
-										  error:@"Couldn't set audio session category to Play and Record"];
-			}
-		}
-		
-		UInt32 overrideAudioRoute = kAudioSessionOverrideAudioRoute_Speaker;
-		success = AudioSessionSetProperty(kAudioSessionProperty_OverrideCategoryDefaultToSpeaker,
-										  sizeof(UInt32),
-										  &overrideAudioRoute);
-		if(success != noErr) {
-			if([self.delegate respondsToSelector:@selector(soundStreamError:error:)]) {
-				[self.delegate soundStreamError:self error:@"Couldn't override audio route"];
-			}
-		}
-    #ifdef __IPHONE_6_0
+ 
 	}
-    #endif 
+
     
     //---------------------------------------------------------- audio unit.
     
@@ -166,7 +143,7 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
     
     // get component and get audio units.
 	AudioComponent inputComponent = AudioComponentFindNext(NULL, &desc);
-	[self checkStatus:AudioComponentInstanceNew(inputComponent, (AudioComponentInstance*)self->audioUnit)];
+	[self checkStatus:AudioComponentInstanceNew(inputComponent, &audioUnit)];
     
     //---------------------------------------------------------- enable io.
 
@@ -174,7 +151,7 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
     UInt32 off = 0;
     
     // enable input to AudioUnit.
-	[self checkStatus:AudioUnitSetProperty(self->audioUnit,
+	[self checkStatus:AudioUnitSetProperty(audioUnit,
 										   kAudioOutputUnitProperty_EnableIO,
 										   kAudioUnitScope_Input,
 										   kInputBus,
@@ -182,7 +159,7 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
 										   sizeof(on))];
     
     // enable output out of AudioUnit.
-	[self checkStatus:AudioUnitSetProperty(self->audioUnit,
+	[self checkStatus:AudioUnitSetProperty(audioUnit,
 										   kAudioOutputUnitProperty_EnableIO,
 										   kAudioUnitScope_Output,
 										   kOutputBus,
@@ -193,18 +170,18 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
     
     // Describe format
     AudioStreamBasicDescription audioFormat = {
-		.mSampleRate       = self.sampleRate,
+		.mSampleRate       = sampleRate,
 		.mFormatID         = kAudioFormatLinearPCM,
 		.mFormatFlags      = kAudioFormatFlagsNativeFloatPacked,
 		.mFramesPerPacket  = 1,
-		.mChannelsPerFrame = self.numOfChannels,
+		.mChannelsPerFrame = numOfChannels,
 		.mBytesPerFrame    = sizeof(Float32),
 		.mBytesPerPacket   = sizeof(Float32),
 		.mBitsPerChannel   = sizeof(Float32) * 8
 	};
     
     // Apply format
-	[self checkStatus:AudioUnitSetProperty(self->audioUnit,
+	[self checkStatus:AudioUnitSetProperty(audioUnit,
 										   kAudioUnitProperty_StreamFormat,
 										   kAudioUnitScope_Output,
 										   kInputBus,
@@ -215,9 +192,9 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
     
     // input callback
     AURenderCallbackStruct callback = {soundInputStreamRenderCallback, &context};
-	context.remoteIO = self->audioUnit;
+	context.remoteIO = self.audioUnit;
 	context.stream = self;
-	[self checkStatus:AudioUnitSetProperty(self->audioUnit,
+	[self checkStatus:AudioUnitSetProperty(audioUnit,
 										   kAudioOutputUnitProperty_SetInputCallback,
 										   kAudioUnitScope_Global,
 										   kInputBus,
@@ -226,20 +203,20 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
     
     //---------------------------------------------------------- make buffers.
     
-	UInt32 bufferListSize = offsetof(AudioBufferList, mBuffers[0]) + (sizeof(AudioBuffer) * self.numOfChannels);
+	UInt32 bufferListSize = offsetof(AudioBufferList, mBuffers[0]) + (sizeof(AudioBuffer) * numOfChannels);
     context.bufferList = (AudioBufferList *)malloc(bufferListSize);
-    context.bufferList->mNumberBuffers = self.numOfChannels;
+    context.bufferList->mNumberBuffers = numOfChannels;
     
 	for(int i=0; i<context.bufferList->mNumberBuffers; i++) {
         context.bufferList->mBuffers[i].mNumberChannels = 1;
-        context.bufferList->mBuffers[i].mDataByteSize = self.bufferSize * sizeof(Float32);
-        context.bufferList->mBuffers[i].mData = calloc(self.bufferSize, sizeof(Float32));
+        context.bufferList->mBuffers[i].mDataByteSize = bufferSize * sizeof(Float32);
+        context.bufferList->mBuffers[i].mData = calloc(bufferSize, sizeof(Float32));
     }
     
     //---------------------------------------------------------- go!
     
-	[self checkStatus:AudioUnitInitialize(self->audioUnit)];
-    [self checkStatus:AudioOutputUnitStart(self->audioUnit)];
+	[self checkStatus:AudioUnitInitialize(audioUnit)];
+    [self checkStatus:AudioOutputUnitStart(audioUnit)];
 }
 
 - (void)stop {
@@ -249,10 +226,10 @@ static OSStatus soundInputStreamRenderCallback(void *inRefCon,
         return;
     }
     
-    AudioOutputUnitStop(self->audioUnit);
-    AudioUnitUninitialize(self->audioUnit);
-    AudioComponentInstanceDispose(self->audioUnit);
-    self->audioUnit = nil;
+    AudioOutputUnitStop(audioUnit);
+    AudioUnitUninitialize(audioUnit);
+    AudioComponentInstanceDispose(audioUnit);
+    audioUnit = nil;
     
 	for(int i=0; i<context.bufferList->mNumberBuffers; i++) {
 		free(context.bufferList->mBuffers[i].mData);
