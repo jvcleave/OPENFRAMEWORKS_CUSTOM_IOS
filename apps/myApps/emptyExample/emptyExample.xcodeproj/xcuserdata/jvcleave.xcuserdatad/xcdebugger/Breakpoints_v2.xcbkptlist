@@ -102,7 +102,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../addons/ofxiOS/src/sound/SoundInputStream.m"
@@ -111,7 +111,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "91"
             endingLineNumber = "91"
-            landmarkName = "-dealloc"
+            landmarkName = "-initWithNumOfChannels:withSampleRate:withBufferSize:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
