@@ -12,3 +12,11 @@ DerivedData
 /libs/openFrameworksCompiled/lib/ios/libofxiOS_iphonesimulator_Debug.a
 /apps/myApps/tvOSExample
 /apps/myApps/SkyMapsTest
+*.xcuserdata
+*.xcbkptlist
+*xcuserdata/
+Breakpoints_v2.xcbkptlist
+xcshareddata
+.DS_Store
+libofxiOS_iphoneos_Debug.a
+*.xcuserstate

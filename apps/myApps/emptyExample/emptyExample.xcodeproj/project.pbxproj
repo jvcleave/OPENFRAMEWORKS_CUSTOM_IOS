@@ -12,6 +12,7 @@
 		036491C11E4984FE0094027F /* AppNavigationController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 036491C01E4984FE0094027F /* AppNavigationController.mm */; };
 		036491CD1E4995D70094027F /* SquareApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 036491CA1E4995D70094027F /* SquareApp.mm */; };
 		036491CE1E4995D70094027F /* ofAppViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 036491CC1E4995D70094027F /* ofAppViewController.mm */; };
+		036DD035292BF593009FB42E /* ofxiOS-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 036DD034292BF593009FB42E /* ofxiOS-Info.plist */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
@@ -61,6 +62,7 @@
 		036491CA1E4995D70094027F /* SquareApp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SquareApp.mm; sourceTree = "<group>"; };
 		036491CB1E4995D70094027F /* ofAppViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofAppViewController.h; sourceTree = "<group>"; };
 		036491CC1E4995D70094027F /* ofAppViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofAppViewController.mm; sourceTree = "<group>"; };
+		036DD034292BF593009FB42E /* ofxiOS-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ofxiOS-Info.plist"; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* emptyExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = emptyExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -125,6 +127,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				036DD034292BF593009FB42E /* ofxiOS-Info.plist */,
 				678E130917951536005B6D19 /* Icon.png */,
 				678E130717951530005B6D19 /* Icon@2x.png */,
 				678E130B1795153C005B6D19 /* Default.png */,
@@ -303,6 +306,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				036DD035292BF593009FB42E /* ofxiOS-Info.plist in Resources */,
 				678E130817951530005B6D19 /* Icon@2x.png in Resources */,
 				036491BC1E4984B70094027F /* MainInterface.storyboard in Resources */,
 				678E130A17951536005B6D19 /* Icon.png in Resources */,
@@ -326,7 +330,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "rsync -avz --exclude='.DS_Store' \"${SRCROOT}/bin/data/\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"";
+			shellScript = "rsync -avz --exclude='.DS_Store' \"${SRCROOT}/bin/data/\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
